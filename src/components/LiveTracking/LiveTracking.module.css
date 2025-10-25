@@ -1,0 +1,304 @@
+.trackingContainer {
+  background: #0f172a;
+  border-radius: 1rem;
+  padding: 2rem;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  min-height: 500px;
+}
+
+.trackingContainer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 80%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.trackingHeader {
+  position: relative;
+  z-index: 2;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.trackingTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(45deg, #3b82f6, #10b981);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.trackingSubtitle {
+  font-size: 1rem;
+  opacity: 0.7;
+  margin-bottom: 2rem;
+}
+
+.statusIndicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 2rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.2); }
+}
+
+.mapContainer {
+  position: relative;
+  height: 300px;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  margin-bottom: 2rem;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+}
+
+.mapOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    linear-gradient(45deg, transparent 48%, rgba(59, 130, 246, 0.1) 49%, rgba(59, 130, 246, 0.1) 51%, transparent 52%),
+    linear-gradient(-45deg, transparent 48%, rgba(16, 185, 129, 0.1) 49%, rgba(16, 185, 129, 0.1) 51%, transparent 52%);
+  animation: mapScan 3s linear infinite;
+}
+
+@keyframes mapScan {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.routePath {
+  position: absolute;
+  top: 50%;
+  left: 10%;
+  right: 10%;
+  height: 2px;
+  background: linear-gradient(90deg, #3b82f6, #10b981);
+  border-radius: 1px;
+  transform: translateY(-50%);
+}
+
+.routeDots {
+  position: absolute;
+  top: 50%;
+  left: 10%;
+  right: 10%;
+  height: 2px;
+  transform: translateY(-50%);
+}
+
+.routeDot {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #3b82f6;
+  border: 2px solid #1e293b;
+  transform: translate(-50%, -50%);
+  animation: routePulse 2s infinite;
+}
+
+.routeDot.completed {
+  background: #10b981;
+}
+
+.routeDot.current {
+  background: #f59e0b;
+  animation: routePulse 1s infinite;
+}
+
+@keyframes routePulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.3); }
+}
+
+.shipmentInfo {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.infoCard {
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  transition: all 0.3s ease;
+}
+
+.infoCard:hover {
+  background: rgba(30, 41, 59, 0.7);
+  border-color: rgba(59, 130, 246, 0.4);
+  transform: translateY(-2px);
+}
+
+.infoLabel {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.7;
+  margin-bottom: 0.25rem;
+}
+
+.infoValue {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #3b82f6;
+}
+
+.infoSubtext {
+  font-size: 0.875rem;
+  opacity: 0.6;
+  margin-top: 0.25rem;
+}
+
+.realTimeData {
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.realTimeTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #10b981;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.liveIndicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  animation: pulse 1s infinite;
+}
+
+.dataGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+}
+
+.dataItem {
+  text-align: center;
+}
+
+.dataValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #f59e0b;
+  margin-bottom: 0.25rem;
+}
+
+.dataLabel {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.7;
+}
+
+.etaCard {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.etaCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.1), transparent);
+  animation: etaShimmer 3s infinite;
+}
+
+@keyframes etaShimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+.etaTitle {
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.7;
+  margin-bottom: 0.5rem;
+}
+
+.etaTime {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #f59e0b;
+  margin-bottom: 0.5rem;
+}
+
+.etaDate {
+  font-size: 0.875rem;
+  opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+  .trackingContainer {
+    padding: 1.5rem;
+    min-height: 400px;
+  }
+  
+  .trackingTitle {
+    font-size: 1.5rem;
+  }
+  
+  .mapContainer {
+    height: 200px;
+  }
+  
+  .shipmentInfo {
+    grid-template-columns: 1fr;
+  }
+  
+  .dataGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+
