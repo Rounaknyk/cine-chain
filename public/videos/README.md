@@ -26,6 +26,3 @@ The app is configured to look for:
 - Primary: `hero-background.mp4`
 - Secondary: `hero-background-2.mp4`
 - Fallback: `fallback-image.jpg`
-
-
-

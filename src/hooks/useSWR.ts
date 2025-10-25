@@ -17,4 +17,3 @@ export function useAPI<T>(endpoint: string) {
   return useData<T>(`/api${endpoint}`);
 }
 
-

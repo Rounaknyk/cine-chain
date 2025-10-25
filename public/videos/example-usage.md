@@ -54,6 +54,3 @@ const videoConfig = {
 - **Slow loading**: Compress the video file
 - **Not looping**: Ensure video is short (under 30 seconds)
 - **File too large**: Use video compression tools
-
-
-

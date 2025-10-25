@@ -49,6 +49,3 @@ fi
 
 echo "✅ Video optimization complete!"
 echo "🎯 Your video should now load much faster in the browser"
-
-
-

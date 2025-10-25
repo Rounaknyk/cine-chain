@@ -1,9 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useEffect, useRef } from 'react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useState, useEffect } from 'react';
 import { Shipment } from '@/data/logisticsTypes';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -44,12 +42,6 @@ export default function LiveTracking({ shipment }: LiveTrackingProps) {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isLive, setIsLive] = useState(true);
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
-  
-  // GSAP Refs
-  const trackingRef = useRef<HTMLDivElement>(null);
-  const metricsRef = useRef<HTMLDivElement>(null);
-  const locationRef = useRef<HTMLDivElement>(null);
-  const alertsRef = useRef<HTMLDivElement>(null);
   const [realTimeData, setRealTimeData] = useState({
     temperature: 22,
     humidity: 45,
@@ -60,84 +52,6 @@ export default function LiveTracking({ shipment }: LiveTrackingProps) {
     fuel: 78,
     signal: 95
   });
-
-  // Initialize GSAP effects
-  useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
-    
-    // Main tracking animation
-    gsap.fromTo(trackingRef.current,
-      { y: 30, opacity: 0, scale: 0.95 },
-      { 
-        y: 0, 
-        opacity: 1, 
-        scale: 1,
-        duration: 1, 
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: trackingRef.current,
-          start: "top 80%",
-          toggleActions: "play none none reverse"
-        }
-      }
-    );
-    
-    // Metrics animation with stagger
-    if (metricsRef.current?.children) {
-      gsap.fromTo(metricsRef.current.children,
-        { y: 20, opacity: 0, scale: 0.9 },
-        { 
-          y: 0, 
-          opacity: 1, 
-          scale: 1,
-          duration: 0.6, 
-          stagger: 0.1, 
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: metricsRef.current,
-            start: "top 85%",
-            toggleActions: "play none none reverse"
-          }
-        }
-      );
-    }
-    
-    // Location animation
-    gsap.fromTo(locationRef.current,
-      { x: -30, opacity: 0 },
-      { 
-        x: 0, 
-        opacity: 1,
-        duration: 0.8, 
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: locationRef.current,
-          start: "top 90%",
-          toggleActions: "play none none reverse"
-        }
-      }
-    );
-    
-    // Alerts animation
-    gsap.fromTo(alertsRef.current,
-      { y: 20, opacity: 0 },
-      { 
-        y: 0, 
-        opacity: 1,
-        duration: 0.8, 
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: alertsRef.current,
-          start: "top 90%",
-          toggleActions: "play none none reverse"
-        }
-      }
-    );
-    
-    return () => {
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-    };
-  }, []);
 
   const [previousData, setPreviousData] = useState(realTimeData);
   const [trends, setTrends] = useState({
@@ -260,7 +174,7 @@ export default function LiveTracking({ shipment }: LiveTrackingProps) {
   };
 
   return (
-    <div ref={trackingRef} className="space-y-6">
+    <div className="space-y-6">
       {/* Modern Header with Live Controls */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -416,7 +330,7 @@ export default function LiveTracking({ shipment }: LiveTrackingProps) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
-        <div ref={metricsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
             { key: 'temperature', icon: Thermometer, label: 'Temperature', unit: '°C', value: realTimeData.temperature },
             { key: 'humidity', icon: Droplets, label: 'Humidity', unit: '%', value: realTimeData.humidity },
@@ -505,7 +419,6 @@ export default function LiveTracking({ shipment }: LiveTrackingProps) {
 
       {/* Enhanced Location & Map */}
       <motion.div
-        ref={locationRef}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.3 }}
@@ -586,7 +499,6 @@ export default function LiveTracking({ shipment }: LiveTrackingProps) {
 
       {/* Smart Alerts & Notifications */}
       <motion.div
-        ref={alertsRef}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.4 }}

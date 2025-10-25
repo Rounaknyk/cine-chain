@@ -40,4 +40,3 @@ export interface MapLocation {
   type: 'cinema' | 'theater' | 'event';
 }
 
-

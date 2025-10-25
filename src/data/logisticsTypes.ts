@@ -125,4 +125,3 @@ export interface SupplyChainNode {
   status: 'operational' | 'maintenance' | 'overloaded' | 'offline';
 }
 
-

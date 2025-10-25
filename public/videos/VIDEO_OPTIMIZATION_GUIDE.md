@@ -63,6 +63,3 @@ public/videos/
 - **Slow loading**: Compress the video file
 - **Poor quality**: Increase bitrate or resolution
 - **Not looping**: Ensure video is short (under 30 seconds)
-
-
-

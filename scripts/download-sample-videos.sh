@@ -31,6 +31,3 @@ echo "   - Duration: 10-30 seconds (for looping)"
 echo "   - Resolution: 1920x1080 or higher"
 echo "   - Format: MP4"
 echo "   - File size: Under 10MB"
-
-
-

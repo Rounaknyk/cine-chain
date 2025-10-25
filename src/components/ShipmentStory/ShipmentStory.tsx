@@ -1,9 +1,6 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useEffect, useRef } from 'react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Shipment } from '@/data/logisticsTypes';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -17,70 +14,6 @@ interface ShipmentStoryProps {
 
 export default function ShipmentStory({ shipment }: ShipmentStoryProps) {
   const { story, timeline, progress, weatherImpact } = shipment;
-  const storyRef = useRef<HTMLDivElement>(null);
-  const timelineRef = useRef<HTMLDivElement>(null);
-  const progressRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
-    
-    // Story section animation
-    gsap.fromTo(storyRef.current,
-      { y: 30, opacity: 0, scale: 0.95 },
-      { 
-        y: 0, 
-        opacity: 1, 
-        scale: 1,
-        duration: 1, 
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: storyRef.current,
-          start: "top 80%",
-          toggleActions: "play none none reverse"
-        }
-      }
-    );
-    
-    // Timeline animation with stagger
-    if (timelineRef.current?.children) {
-      gsap.fromTo(timelineRef.current.children,
-        { x: -30, opacity: 0, scale: 0.9 },
-        { 
-          x: 0, 
-          opacity: 1, 
-          scale: 1,
-          duration: 0.6, 
-          stagger: 0.1, 
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: timelineRef.current,
-            start: "top 85%",
-            toggleActions: "play none none reverse"
-          }
-        }
-      );
-    }
-    
-    // Progress animation
-    gsap.fromTo(progressRef.current,
-      { scaleX: 0, opacity: 0 },
-      { 
-        scaleX: 1, 
-        opacity: 1,
-        duration: 1.5, 
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: progressRef.current,
-          start: "top 90%",
-          toggleActions: "play none none reverse"
-        }
-      }
-    );
-    
-    return () => {
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-    };
-  }, []);
 
   const getWeatherIcon = (type: string) => {
     switch (type) {
@@ -100,7 +33,7 @@ export default function ShipmentStory({ shipment }: ShipmentStoryProps) {
   };
 
   return (
-    <div ref={storyRef} className="space-y-6">
+    <div className="space-y-6">
       {/* Weather Alert */}
       {weatherImpact && weatherImpact.impact !== 'none' && (
         <motion.div
@@ -158,7 +91,7 @@ export default function ShipmentStory({ shipment }: ShipmentStoryProps) {
               </div>
             </div>
             
-            <div ref={progressRef} className="space-y-2">
+            <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span>Progress</span>
                 <span>{progress}%</span>
@@ -212,7 +145,7 @@ export default function ShipmentStory({ shipment }: ShipmentStoryProps) {
           <CardDescription>Key milestones in your package's adventure</CardDescription>
         </CardHeader>
         <CardContent>
-          <div ref={timelineRef} className="space-y-4">
+          <div className="space-y-4">
             {timeline.map((event, index) => (
               <motion.div
                 key={index}
