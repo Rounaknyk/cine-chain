@@ -30,9 +30,42 @@ import {
   RefreshCw,
   TrendingUp,
   TrendingDown,
-  Minus
+  Minus,
+  Plane,
+  Ship,
+  Warehouse
 } from 'lucide-react';
-import Image from 'next/image';
+import dynamic from 'next/dynamic';
+import 'leaflet/dist/leaflet.css';
+import { Suspense } from 'react';
+
+// Dynamically import 3D components to avoid SSR issues
+const Canvas = dynamic(() => import('@react-three/fiber').then(mod => ({ default: mod.Canvas })), { ssr: false });
+const useGLTF = dynamic(() => import('@react-three/drei').then(mod => ({ default: mod.useGLTF })), { ssr: false });
+const OrbitControls = dynamic(() => import('@react-three/drei').then(mod => ({ default: mod.OrbitControls })), { ssr: false });
+const Environment = dynamic(() => import('@react-three/drei').then(mod => ({ default: mod.Environment })), { ssr: false });
+
+// 3D Package Model Component
+function PackageModel() {
+  if (typeof window === 'undefined') return null;
+  
+  const { scene } = (useGLTF as any)('/3d/box_package.glb');
+  
+  return (
+    <primitive 
+      object={scene} 
+      scale={2.5} 
+      position={[0, 0, 0]}
+      rotation={[0.2, 0, 0]}
+    />
+  );
+}
+
+const MapContainer = dynamic(() => import('react-leaflet').then(m => m.MapContainer), { ssr: false });
+const TileLayer = dynamic(() => import('react-leaflet').then(m => m.TileLayer), { ssr: false });
+const Polyline = dynamic(() => import('react-leaflet').then(m => m.Polyline), { ssr: false });
+const CircleMarker = dynamic(() => import('react-leaflet').then(m => m.CircleMarker), { ssr: false });
+const Tooltip = dynamic(() => import('react-leaflet').then(m => m.Tooltip), { ssr: false });
 
 interface LiveTrackingProps {
   shipment: Shipment;
@@ -173,93 +206,161 @@ export default function LiveTracking({ shipment }: LiveTrackingProps) {
     }));
   };
 
+  const toLatLng = (coords: [number, number]) => [coords[1], coords[0]] as [number, number];
+  const checkpoints = [shipment.origin, ...shipment.timeline.map(t => t.location), shipment.destination];
+  const positions = checkpoints.map(c => toLatLng(c.coordinates));
+  const currentPos = toLatLng(shipment.currentLocation.coordinates);
+
+  // Journey stages data
+  const journeyStages = [
+    {
+      id: 1,
+      title: 'Package Received',
+      description: 'Shipment initiated at origin facility',
+      location: 'Delhi Port, India',
+      status: 'completed',
+      icon: Package,
+      color: 'blue',
+      time: '2 hours',
+    },
+    {
+      id: 2,
+      title: 'Ground Transit',
+      description: 'En route via regional transport network',
+      location: 'Jaipur Hub, India',
+      status: 'active',
+      icon: Truck,
+      color: 'blue',
+      time: '4 hours',
+    },
+    {
+      id: 3,
+      title: 'Delivered',
+      description: 'Package ready for final handoff',
+      location: 'Mumbai, India',
+      status: 'pending',
+      icon: CheckCircle,
+      color: 'blue',
+      time: 'Pending',
+    },
+  ];
+
   return (
     <div className="space-y-6">
-      {/* Modern Header with Live Controls */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <Card className="border-2 border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-2">
+      {/* Journey Timeline Card */}
+      <Card>
+        <CardHeader>
+          <div>
+            <CardTitle className="flex items-center space-x-2">
+              <Route className="h-5 w-5" />
+              <span>Shipment Journey</span>
+            </CardTitle>
+            <CardDescription>Click on any stage to view detailed information</CardDescription>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="relative">
+            {/* Timeline connector line */}
+            <div className="absolute top-8 left-8 md:left-0 md:top-16 w-1 md:w-full h-full md:h-1 bg-gradient-to-b md:bg-gradient-to-r from-blue-400 via-blue-300 to-blue-200" />
+            
+            {/* Journey stages */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-4 relative">
+              {journeyStages.map((stage, index) => {
+                const Icon = stage.icon;
+                const isCompleted = stage.status === 'completed';
+                const isActive = stage.status === 'active';
+                const isPending = stage.status === 'pending';
+                return (
                   <motion.div
-                    animate={{ rotate: isLive ? 360 : 0 }}
-                    transition={{ duration: 2, repeat: isLive ? Infinity : 0 }}
+                    key={stage.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 * index, duration: 0.5 }}
+                    className="relative flex flex-col items-center text-center"
                   >
-                    <Truck className="h-6 w-6 text-blue-600" />
-                  </motion.div>
-                  <div>
-                    <CardTitle className="text-xl">Live Tracking Dashboard</CardTitle>
-                    <CardDescription className="text-sm">
-                      Real-time monitoring for {shipment.trackingNumber}
-                    </CardDescription>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className={`w-3 h-3 rounded-full ${isLive ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`} />
-                  <span className="text-sm font-medium">{isLive ? 'LIVE' : 'PAUSED'}</span>
-                </div>
+                    {/* Icon circle */}
+              {/* Journey stages */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-4 relative">
+                {journeyStages.map((stage, index) => {
+                  const Icon = stage.icon;
+                  const isCompleted = stage.status === 'completed';
+                  const isActive = stage.status === 'active';
+                  const isPending = stage.status === 'pending';
+                  return (
+                    <motion.div
+                      key={stage.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.1 * index, duration: 0.5 }}
+                      className="relative flex flex-col items-center text-center"
+                    >
+                      {/* Icon circle */}
+                      <motion.div
+                        className={`relative z-10 w-16 h-16 rounded-full flex items-center justify-center shadow-lg border-4 ${
+                          isCompleted
+                            ? 'bg-blue-500 border-blue-300'
+                            : isActive
+                            ? 'bg-blue-500 border-blue-300'
+                            : 'bg-blue-200 border-blue-100'
+                        }`}
+                        whileHover={{ scale: 1.1 }}
+                        animate={isActive ? {
+                          boxShadow: [
+                            '0 0 0 0 rgba(59, 130, 246, 0.7)',
+                            '0 0 0 15px rgba(59, 130, 246, 0)',
+                            '0 0 0 0 rgba(59, 130, 246, 0)'
+                          ]
+                        } : {}}
+                        transition={isActive ? { duration: 2, repeat: Infinity } : {}}
+                      >
+                        <Icon className={`h-7 w-7 ${
+                          isCompleted || isActive ? 'text-white' : 'text-blue-400'
+                        }`} />
+                      </motion.div>
+                      
+                      {/* Stage info */}
+                      <div className="mt-4 space-y-1">
+                        <h4 className={`font-bold text-sm ${
+                          isCompleted || isActive ? 'text-blue-600' : 'text-gray-500'
+                        }`}>
+                          {stage.title}
+                        </h4>
+                        <p className="text-xs text-gray-600 max-w-[150px]">
+                          {stage.description}
+                        </p>
+                        <div className="flex items-center justify-center space-x-1 text-xs text-gray-500 mt-2">
+                          <MapPin className="h-3 w-3" />
+                          <span>{stage.location}</span>
+                        </div>
+                        <div className="flex items-center justify-center space-x-1 text-xs mt-1">
+                          <Clock className="h-3 w-3" />
+                          <span className={isCompleted ? 'text-blue-600 font-semibold' : 'text-blue-500'}>
+                            {stage.time}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      {/* Status badge */}
+                      {isCompleted && (
+                        <Badge className="mt-2 bg-blue-100 text-blue-700 border-blue-300">
+                          Completed
+                        </Badge>
+                      )}
+                      {isActive && (
+                        <Badge className="mt-2 bg-blue-500 text-white animate-pulse">
+                          In Progress
+                        </Badge>
+                      )}
+                      {isPending && (
+                        <Badge variant="outline" className="mt-2 text-blue-600 border-blue-300">
+                          Pending
+                        </Badge>
+                      )}
+                    </motion.div>
+                  );
+                })}
               </div>
-              <div className="flex items-center space-x-3">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={toggleLive}
-                  className="flex items-center space-x-2"
-                >
-                  {isLive ? <Eye className="h-4 w-4" /> : <Zap className="h-4 w-4" />}
-                  <span>{isLive ? 'Pause' : 'Resume'}</span>
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={refreshData}
-                  className="flex items-center space-x-2"
-                >
-                  <RefreshCw className="h-4 w-4" />
-                  <span>Refresh</span>
-                </Button>
-                <Badge className={`${getStatusColor(shipment.status)} px-3 py-1`}>
-                  {getStatusIcon(shipment.status)}
-                  <span className="ml-1">{shipment.status.replace('_', ' ').toUpperCase()}</span>
-                </Badge>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
-              <div className="flex items-center space-x-2 p-3 bg-white rounded-lg border">
-                <MapPin className="h-4 w-4 text-blue-500" />
-                <div>
-                  <div className="font-medium">{shipment.origin.city} → {shipment.destination.city}</div>
-                  <div className="text-xs text-gray-500">Route</div>
-                </div>
-              </div>
-              <div className="flex items-center space-x-2 p-3 bg-white rounded-lg border">
-                <Clock className="h-4 w-4 text-green-500" />
-                <div>
-                  <div className="font-medium">{shipment.estimatedDelivery.toLocaleDateString()}</div>
-                  <div className="text-xs text-gray-500">ETA</div>
-                </div>
-              </div>
-              <div className="flex items-center space-x-2 p-3 bg-white rounded-lg border">
-                <Package className="h-4 w-4 text-purple-500" />
-                <div>
-                  <div className="font-medium">{shipment.progress}%</div>
-                  <div className="text-xs text-gray-500">Progress</div>
-                </div>
-              </div>
-              <div className="flex items-center space-x-2 p-3 bg-white rounded-lg border">
-                <Signal className="h-4 w-4 text-orange-500" />
-                <div>
-                  <div className="font-medium">{realTimeData.signal.toFixed(0)}%</div>
-                  <div className="text-xs text-gray-500">Signal</div>
-                </div>
-              </div>
+              {/* ... (rest of the code remains the same) */}
             </div>
           </CardContent>
         </Card>
@@ -465,13 +566,27 @@ export default function LiveTracking({ shipment }: LiveTrackingProps) {
               </div>
               
               <div className="relative">
-                <Image
-                  src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
-                  alt="Current location"
-                  width={600}
-                  height={200}
-                  className="rounded-lg w-full h-48 object-cover"
-                />
+                <div className="rounded-lg overflow-hidden">
+                  <MapContainer center={currentPos} zoom={4} className="w-full h-48" scrollWheelZoom={false}>
+                    <TileLayer
+                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+                    <Polyline positions={positions} pathOptions={{ color: '#6366F1', weight: 4 }} />
+                    {positions.map((pos, idx) => (
+                      <CircleMarker key={idx} center={pos} radius={6} pathOptions={{
+                        color: idx <= nearestIndex ? '#16A34A' : '#9CA3AF',
+                        fillColor: idx <= nearestIndex ? '#16A34A' : '#9CA3AF',
+                        fillOpacity: 0.9
+                      }}>
+                        <Tooltip>{checkpoints[idx].name}</Tooltip>
+                      </CircleMarker>
+                    ))}
+                    <CircleMarker center={currentPos} radius={8} pathOptions={{ color: '#2563EB', fillColor: '#2563EB', fillOpacity: 1 }}>
+                      <Tooltip>Current Position</Tooltip>
+                    </CircleMarker>
+                  </MapContainer>
+                </div>
                 <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg p-2">
                   <div className="text-xs text-gray-600">Last Update</div>
                   <div className="font-mono text-sm">{formatTime(currentTime)}</div>

@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { SupplyChainNode, DashboardMetrics } from '@/data/logisticsTypes';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -72,20 +72,317 @@ export default function SupplyChainMap({ nodes, metrics }: SupplyChainMapProps) 
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Network Map */}
-            <div className="relative">
-              <Image
-                src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
-                alt="Supply chain network map"
-                width={600}
-                height={400}
-                className="rounded-lg w-full h-64 object-cover"
-              />
-              <div className="absolute inset-0 bg-black/20 rounded-lg" />
-              <div className="absolute top-4 left-4 text-white">
-                <h3 className="font-semibold">Global Network</h3>
-                <p className="text-sm opacity-90">Real-time supply chain visualization</p>
+            {/* Interactive Network Map */}
+            <div className="relative bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 rounded-lg overflow-hidden h-64 border border-blue-800/30">
+              {/* Simple dotted background */}
+              <div className="absolute inset-0 opacity-10">
+                <div className="w-full h-full" style={{
+                  backgroundImage: 'radial-gradient(circle, #3B82F6 1px, transparent 1px)',
+                  backgroundSize: '30px 30px'
+                }} />
               </div>
+
+              {/* Dotted background pattern */}
+              <div className="absolute inset-0 opacity-10">
+                <div className="w-full h-full" style={{
+                  backgroundImage: 'radial-gradient(circle, #60A5FA 1px, transparent 1px)',
+                  backgroundSize: '30px 30px'
+                }} />
+              </div>
+
+              {/* Network Diagram */}
+              <div className="absolute inset-0 p-6">
+                {/* Connection Lines */}
+                <svg className="absolute inset-0 w-full h-full" style={{ zIndex: 1 }}>
+                  <defs>
+                    <linearGradient id="activeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.6" />
+                      <stop offset="100%" stopColor="#06B6D4" stopOpacity="0.6" />
+                    </linearGradient>
+                  </defs>
+                  
+                  {/* Delhi to Jaipur */}
+                  <motion.line
+                    x1="15%" y1="30%" x2="35%" y2="50%"
+                    stroke="url(#activeGradient)"
+                    strokeWidth="2"
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: 1 }}
+                    transition={{ duration: 1, delay: 0.5 }}
+                  />
+                  {/* Jaipur to Mumbai */}
+                  <motion.line
+                    x1="35%" y1="50%" x2="20%" y2="70%"
+                    stroke="url(#activeGradient)"
+                    strokeWidth="2"
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: 1 }}
+                    transition={{ duration: 1, delay: 0.7 }}
+                  />
+                  {/* Mumbai to Bangalore */}
+                  <motion.line
+                    x1="20%" y1="70%" x2="50%" y2="75%"
+                    stroke="url(#activeGradient)"
+                    strokeWidth="2"
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: 1 }}
+                    transition={{ duration: 1, delay: 0.9 }}
+                  />
+                  {/* Bangalore to Chennai */}
+                  <motion.line
+                    x1="50%" y1="75%" x2="70%" y2="70%"
+                    stroke="url(#activeGradient)"
+                    strokeWidth="2"
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: 1 }}
+                    transition={{ duration: 1, delay: 1.1 }}
+                  />
+                  {/* Chennai to Kolkata */}
+                  <motion.line
+                    x1="70%" y1="70%" x2="80%" y2="40%"
+                    stroke="url(#activeGradient)"
+                    strokeWidth="2"
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: 1 }}
+                    transition={{ duration: 1, delay: 1.3 }}
+                  />
+                  {/* Kolkata to Delhi */}
+                  <motion.line
+                    x1="80%" y1="40%" x2="15%" y2="30%"
+                    stroke="url(#activeGradient)"
+                    strokeWidth="2"
+                    strokeDasharray="4,4"
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: 1 }}
+                    transition={{ duration: 1, delay: 1.5 }}
+                  />
+                  
+                  {/* Animated shipment packets */}
+                  <motion.circle
+                    r="4"
+                    fill="#10B981"
+                    filter="url(#glow)"
+                    initial={{ cx: '15%', cy: '30%' }}
+                    animate={{
+                      cx: ['15%', '35%', '20%', '50%'],
+                      cy: ['30%', '50%', '70%', '75%'],
+                    }}
+                    transition={{
+                      duration: 4,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
+                  />
+                  <motion.circle
+                    r="4"
+                    fill="#F59E0B"
+                    filter="url(#glow)"
+                    initial={{ cx: '70%', cy: '70%' }}
+                    animate={{
+                      cx: ['70%', '80%', '15%'],
+                      cy: ['70%', '40%', '30%'],
+                    }}
+                    transition={{
+                      duration: 3.5,
+                      repeat: Infinity,
+                      ease: "linear",
+                      delay: 1,
+                    }}
+                  />
+                  
+                  <defs>
+                    <filter id="glow">
+                      <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                      <feMerge>
+                        <feMergeNode in="coloredBlur" />
+                        <feMergeNode in="SourceGraphic" />
+                      </feMerge>
+                    </filter>
+                  </defs>
+                </svg>
+
+                {/* Location Nodes */}
+                <div className="relative w-full h-full" style={{ zIndex: 2 }}>
+                  {/* Delhi - Origin */}
+                  <motion.div
+                    className="absolute"
+                    style={{ left: '15%', top: '30%', transform: 'translate(-50%, -50%)' }}
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                  >
+                    <div className="relative group cursor-pointer">
+                      <motion.div
+                        className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center shadow-lg border-2 border-blue-300"
+                        whileHover={{ scale: 1.1 }}
+                        animate={{
+                          boxShadow: ['0 0 0 0 rgba(59, 130, 246, 0.7)', '0 0 0 10px rgba(59, 130, 246, 0)', '0 0 0 0 rgba(59, 130, 246, 0)']
+                        }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      >
+                        <Warehouse className="h-6 w-6 text-white" />
+                      </motion.div>
+                      <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-blue-500/90 text-white px-2 py-1 rounded text-xs font-semibold">
+                        Delhi
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  {/* Jaipur - Checkpoint */}
+                  <motion.div
+                    className="absolute"
+                    style={{ left: '35%', top: '50%', transform: 'translate(-50%, -50%)' }}
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.5 }}
+                  >
+                    <div className="relative group cursor-pointer">
+                      <motion.div
+                        className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center shadow-lg border-2 border-purple-300"
+                        whileHover={{ scale: 1.1 }}
+                      >
+                        <Truck className="h-5 w-5 text-white" />
+                      </motion.div>
+                      <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-purple-500/90 text-white px-2 py-1 rounded text-xs font-semibold">
+                        Jaipur
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  {/* Mumbai - Hub */}
+                  <motion.div
+                    className="absolute"
+                    style={{ left: '20%', top: '70%', transform: 'translate(-50%, -50%)' }}
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.7 }}
+                  >
+                    <div className="relative group cursor-pointer">
+                      <motion.div
+                        className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center shadow-lg border-2 border-green-300"
+                        whileHover={{ scale: 1.1 }}
+                        animate={{
+                          boxShadow: ['0 0 0 0 rgba(34, 197, 94, 0.7)', '0 0 0 10px rgba(34, 197, 94, 0)', '0 0 0 0 rgba(34, 197, 94, 0)']
+                        }}
+                        transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+                      >
+                        <Store className="h-6 w-6 text-white" />
+                      </motion.div>
+                      <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-green-500/90 text-white px-2 py-1 rounded text-xs font-semibold">
+                        Mumbai
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  {/* Bangalore - Distribution */}
+                  <motion.div
+                    className="absolute"
+                    style={{ left: '50%', top: '75%', transform: 'translate(-50%, -50%)' }}
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.9 }}
+                  >
+                    <div className="relative group cursor-pointer">
+                      <motion.div
+                        className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center shadow-lg border-2 border-orange-300"
+                        whileHover={{ scale: 1.1 }}
+                      >
+                        <Factory className="h-5 w-5 text-white" />
+                      </motion.div>
+                      <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-orange-500/90 text-white px-2 py-1 rounded text-xs font-semibold">
+                        Bangalore
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  {/* Chennai - Port */}
+                  <motion.div
+                    className="absolute"
+                    style={{ left: '70%', top: '70%', transform: 'translate(-50%, -50%)' }}
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 1.1 }}
+                  >
+                    <div className="relative group cursor-pointer">
+                      <motion.div
+                        className="w-10 h-10 bg-cyan-500 rounded-full flex items-center justify-center shadow-lg border-2 border-cyan-300"
+                        whileHover={{ scale: 1.1 }}
+                      >
+                        <Package className="h-5 w-5 text-white" />
+                      </motion.div>
+                      <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-cyan-500/90 text-white px-2 py-1 rounded text-xs font-semibold">
+                        Chennai
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  {/* Kolkata - Destination */}
+                  <motion.div
+                    className="absolute"
+                    style={{ left: '80%', top: '40%', transform: 'translate(-50%, -50%)' }}
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 1.3 }}
+                  >
+                    <div className="relative group cursor-pointer">
+                      <motion.div
+                        className="w-12 h-12 bg-pink-500 rounded-full flex items-center justify-center shadow-lg border-2 border-pink-300"
+                        whileHover={{ scale: 1.1 }}
+                        animate={{
+                          boxShadow: ['0 0 0 0 rgba(236, 72, 153, 0.7)', '0 0 0 10px rgba(236, 72, 153, 0)', '0 0 0 0 rgba(236, 72, 153, 0)']
+                        }}
+                        transition={{ duration: 2, repeat: Infinity, delay: 1 }}
+                      >
+                        <MapPin className="h-6 w-6 text-white" />
+                      </motion.div>
+                      <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-pink-500/90 text-white px-2 py-1 rounded text-xs font-semibold">
+                        Kolkata
+                      </div>
+                    </div>
+                  </motion.div>
+                </div>
+              </div>
+
+              {/* Overlay text */}
+              <div className="absolute top-4 left-4 text-white z-10">
+                <motion.h3 
+                  className="font-semibold text-lg"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  Global Network
+                </motion.h3>
+                <motion.p 
+                  className="text-sm opacity-90"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.7 }}
+                >
+                  Real-time supply chain visualization
+                </motion.p>
+              </div>
+
+              {/* Live indicator */}
+              <motion.div 
+                className="absolute top-4 right-4 flex items-center space-x-2 bg-green-500/20 backdrop-blur-sm px-3 py-1.5 rounded-full border border-green-500/30"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 1 }}
+              >
+                <motion.div
+                  className="w-2 h-2 bg-green-400 rounded-full"
+                  animate={{
+                    scale: [1, 1.3, 1],
+                    opacity: [1, 0.6, 1],
+                  }}
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                  }}
+                />
+                <span className="text-xs text-green-100 font-medium">LIVE</span>
+              </motion.div>
             </div>
 
             {/* Network Stats */}
